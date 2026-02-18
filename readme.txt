@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,6 +87,14 @@ Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
 
+== 1.0.9 ==
+Released: 2026-02-18
+
+* Fixed fatal error "Class Exception not found" in Single_Product.php
+* Replaced exception throwing with graceful error handling (WooCommerce best practice)
+* Added woocommerce_add_to_cart_validation filter to block native add-to-cart for marketplace products
+* Added redirect URL fix to prevent double slash in URLs (/pricing//?add-to-cart=)
+* Marketplace products now require using the marketplace interface for add-to-cart
 
 == 1.0.8 ==
 Released: 2026-02-18

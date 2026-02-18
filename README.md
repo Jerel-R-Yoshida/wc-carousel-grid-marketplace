@@ -133,6 +133,13 @@ _Screenshots to be added_
 
 ## Changelog
 
+### 1.0.9 - 2026-02-18
+* Fixed fatal error "Class Exception not found" in Single_Product.php
+* Replaced exception throwing with graceful error handling (WooCommerce best practice)
+* Added validation to block native add-to-cart for marketplace products
+* Added redirect URL fix to prevent double slash in URLs
+* Marketplace products now require using the marketplace interface
+
 ### 1.0.8 - 2026-02-18
 * Fixed tier selection validation for Entry and Expert levels
 * Added server-side and client-side validation in add-to-cart flow

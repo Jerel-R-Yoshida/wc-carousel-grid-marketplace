@@ -9,6 +9,8 @@ class Single_Product {
         add_filter('woocommerce_get_price_html', [$this, 'filter_price_html'], 10, 2);
         add_action('woocommerce_before_add_to_cart_button', [$this, 'render_tier_selector']);
         add_filter('woocommerce_add_cart_item_data', [$this, 'add_cart_item_data'], 10, 3);
+        add_filter('woocommerce_add_to_cart_validation', [$this, 'validate_marketplace_cart'], 10, 6);
+        add_filter('woocommerce_add_to_cart_redirect', [$this, 'fix_redirect_url'], 10, 2);
     }
 
     public function filter_price_html(string $price, \WC_Product $product): string {
@@ -90,11 +92,12 @@ class Single_Product {
             return $cart_item_data;
         }
 
-        $tier_level = isset($_POST['wc_cgm_tier_level']) ? absint($_POST['wc_cgm_tier_level']) : 0;
-        $price_type = isset($_POST['wc_cgm_price_type']) ? sanitize_text_field($_POST['wc_cgm_price_type']) : 'hourly';
+        $tier_level = isset($_POST['wc_cgm_tier_level']) ? \absint($_POST['wc_cgm_tier_level']) : 0;
+        $price_type = isset($_POST['wc_cgm_price_type']) ? \sanitize_text_field($_POST['wc_cgm_price_type']) : 'hourly';
 
         if ($tier_level <= 0) {
-            throw new Exception(__('Please select an experience level.', 'wc-carousel-grid-marketplace'));
+            wc_cgm_log('[WELP] No tier in POST, skipping tier data', ['product_id' => $product_id]);
+            return $cart_item_data;
         }
 
         $plugin = wc_cgm();
@@ -102,16 +105,15 @@ class Single_Product {
         $tier = $repository->get_tier($product_id, $tier_level);
 
         if (!$tier) {
-            throw new Exception(__('Invalid experience level selected.', 'wc-carousel-grid-marketplace'));
+            wc_cgm_log('[WELP] Invalid tier for product', ['product_id' => $product_id, 'tier_level' => $tier_level]);
+            return $cart_item_data;
         }
 
         $price = $price_type === 'monthly' ? $tier->monthly_price : $tier->hourly_price;
 
         if ($price <= 0) {
-            throw new Exception(sprintf(
-                __('%s pricing is not available for this experience level.', 'wc-carousel-grid-marketplace'),
-                $price_type === 'monthly' ? __('Monthly', 'wc-carousel-grid-marketplace') : __('Hourly', 'wc-carousel-grid-marketplace')
-            ));
+            wc_cgm_log('[WELP] Invalid price for tier', ['product_id' => $product_id, 'tier_level' => $tier_level, 'price_type' => $price_type]);
+            return $cart_item_data;
         }
 
         $cart_item_data['wc_cgm_tier'] = [
@@ -122,5 +124,39 @@ class Single_Product {
         ];
 
         return $cart_item_data;
+    }
+
+    public function validate_marketplace_cart(bool $passed, int $product_id, int $quantity, int $variation_id = 0, array $variation = [], array $cart_item_data = []): bool {
+        if (!$passed) {
+            return false;
+        }
+
+        if (!wc_cgm_is_marketplace_product($product_id)) {
+            return true;
+        }
+
+        if (!wc_cgm_tier_pricing_enabled()) {
+            return true;
+        }
+
+        if (\wp_doing_ajax() && isset($_POST['action']) && $_POST['action'] === 'wc_cgm_add_to_cart') {
+            return true;
+        }
+
+        if (isset($cart_item_data['wc_cgm_tier'])) {
+            return true;
+        }
+
+        \wc_add_notice(
+            __('This product requires selecting an experience level. Please use the marketplace interface.', 'wc-carousel-grid-marketplace'),
+            'error'
+        );
+        return false;
+    }
+
+    public function fix_redirect_url(string $url, ?string $adding_to_cart = null): string {
+        $url = \str_replace('//?', '/?', $url);
+        $url = \preg_replace('#(?<!:)//+#', '/', $url);
+        return $url;
     }
 }
