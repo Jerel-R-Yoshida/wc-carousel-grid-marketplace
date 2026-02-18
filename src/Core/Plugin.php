@@ -8,6 +8,7 @@ class Plugin {
     private static ?Plugin $instance = null;
     private array $services = [];
     private string $version = WC_CGM_VERSION;
+    private bool $woocommerce_services_loaded = false;
 
     public static function get_instance(): Plugin {
         if (null === self::$instance) {
@@ -17,20 +18,39 @@ class Plugin {
     }
 
     private function __construct() {
-        $this->register_services();
+        $this->register_core_services();
         $this->init_hooks();
+        $this->schedule_woocommerce_services();
     }
 
-    private function register_services(): void {
+    private function register_core_services(): void {
         $this->services = [
-            'logger' => new Debug_Logger(),
+            'logger' => Debug_Logger::get_instance(),
             'repository' => new \WC_CGM\Database\Repository(),
             'settings' => new \WC_CGM\Admin\Settings(),
-            'admin' => new \WC_CGM\Admin\Admin_Manager(),
-            'frontend' => new \WC_CGM\Frontend\Frontend_Manager(),
-            'woocommerce' => new \WC_CGM\WooCommerce\WooCommerce_Hooks(),
-            'elementor' => new \WC_CGM\Elementor\Elementor_Manager(),
         ];
+    }
+
+    private function schedule_woocommerce_services(): void {
+        if (class_exists('WooCommerce', false)) {
+            $this->register_woocommerce_services();
+        } else {
+            add_action('woocommerce_loaded', [$this, 'register_woocommerce_services']);
+            add_action('plugins_loaded', [$this, 'register_woocommerce_services_fallback'], 20);
+        }
+    }
+
+    public function register_woocommerce_services(): void {
+        if ($this->woocommerce_services_loaded) {
+            return;
+        }
+
+        $this->woocommerce_services_loaded = true;
+
+        $this->services['admin'] = new \WC_CGM\Admin\Admin_Manager();
+        $this->services['frontend'] = new \WC_CGM\Frontend\Frontend_Manager();
+        $this->services['woocommerce'] = new \WC_CGM\WooCommerce\WooCommerce_Hooks();
+        $this->services['elementor'] = new \WC_CGM\Elementor\Elementor_Manager();
 
         if (wc_cgm_tier_pricing_enabled()) {
             $this->services['product_meta_box'] = new \WC_CGM\Admin\Product_Meta_Box();
@@ -38,6 +58,13 @@ class Plugin {
             $this->services['cart_integration'] = new \WC_CGM\Frontend\Cart_Integration();
             $this->services['order_handler'] = new \WC_CGM\WooCommerce\Order_Handler();
         }
+    }
+
+    public function register_woocommerce_services_fallback(): void {
+        if (!class_exists('WooCommerce', false)) {
+            return;
+        }
+        $this->register_woocommerce_services();
     }
 
     private function init_hooks(): void {
@@ -143,5 +170,9 @@ class Plugin {
 
     public function get_version(): string {
         return $this->version;
+    }
+
+    public function is_woocommerce_loaded(): bool {
+        return $this->woocommerce_services_loaded;
     }
 }
