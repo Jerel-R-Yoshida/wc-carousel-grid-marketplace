@@ -68,17 +68,17 @@ class Activator {
 
     private function set_default_options(): void {
         $defaults = [
-            'wc_cgm_enable_tier_pricing' => 'no',
-            'wc_cgm_grid_columns' => 3,
-            'wc_cgm_mobile_carousel' => 'yes',
-            'wc_cgm_show_sidebar' => 'yes',
-            'wc_cgm_show_filter_bar' => 'yes',
-            'wc_cgm_cards_per_page' => 12,
-            'wc_cgm_enable_infinite_scroll' => 'no',
-            'wc_cgm_card_style' => 'default',
-            'wc_cgm_popular_method' => 'auto',
-            'wc_cgm_popular_threshold' => 5,
-            'wc_cgm_popular_days' => 30,
+            'welp_enable_tier_pricing' => 'no',
+            'welp_grid_columns' => 3,
+            'welp_mobile_carousel' => 'yes',
+            'welp_show_sidebar' => 'yes',
+            'welp_show_filter_bar' => 'yes',
+            'welp_cards_per_page' => 12,
+            'welp_enable_infinite_scroll' => 'no',
+            'welp_card_style' => 'default',
+            'welp_popular_method' => 'auto',
+            'welp_popular_threshold' => 5,
+            'welp_popular_days' => 30,
         ];
 
         foreach ($defaults as $option => $value) {

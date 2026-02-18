@@ -12,7 +12,7 @@ class Product_Meta_Box {
 
     public function add_meta_box(): void {
         add_meta_box(
-            'wc_cgm_marketplace',
+            'welp_marketplace',
             __('Marketplace Settings', 'wc-carousel-grid-marketplace'),
             [$this, 'render_meta_box'],
             'product',
@@ -22,7 +22,7 @@ class Product_Meta_Box {
 
         if (wc_cgm_tier_pricing_enabled()) {
             add_meta_box(
-                'wc_cgm_tier_pricing',
+                'welp_tier_pricing',
                 __('Tier Pricing', 'wc-carousel-grid-marketplace'),
                 [$this, 'render_tier_meta_box'],
                 'product',
@@ -33,11 +33,11 @@ class Product_Meta_Box {
     }
 
     public function render_meta_box(\WP_Post $post): void {
-        wp_nonce_field('wc_cgm_product_meta', 'wc_cgm_product_meta_nonce');
+        wp_nonce_field('welp_product_meta', 'welp_product_meta_nonce');
 
-        $enabled = get_post_meta($post->ID, '_wc_cgm_enabled', true) === 'yes';
-        $popular = get_post_meta($post->ID, '_wc_cgm_popular', true) === 'yes';
-        $specialization = get_post_meta($post->ID, '_wc_cgm_specialization', true);
+        $enabled = get_post_meta($post->ID, '_welp_enabled', true) === 'yes';
+        $popular = get_post_meta($post->ID, '_welp_popular', true) === 'yes';
+        $specialization = get_post_meta($post->ID, '_welp_specialization', true);
 
         include WC_CGM_PLUGIN_DIR . 'templates/admin/tier-meta-box.php';
     }
@@ -112,7 +112,7 @@ class Product_Meta_Box {
     }
 
     public function save_meta_box(int $post_id, \WP_Post $post): void {
-        if (!isset($_POST['wc_cgm_product_meta_nonce']) || !wp_verify_nonce($_POST['wc_cgm_product_meta_nonce'], 'wc_cgm_product_meta')) {
+        if (!isset($_POST['welp_product_meta_nonce']) || !wp_verify_nonce($_POST['welp_product_meta_nonce'], 'welp_product_meta')) {
             return;
         }
 
@@ -124,19 +124,19 @@ class Product_Meta_Box {
             return;
         }
 
-        $enabled = isset($_POST['wc_cgm_enabled']) && $_POST['wc_cgm_enabled'] === 'yes';
-        update_post_meta($post_id, '_wc_cgm_enabled', $enabled ? 'yes' : 'no');
+        $enabled = isset($_POST['welp_enabled']) && $_POST['welp_enabled'] === 'yes';
+        update_post_meta($post_id, '_welp_enabled', $enabled ? 'yes' : 'no');
 
-        $popular = isset($_POST['wc_cgm_popular']) && $_POST['wc_cgm_popular'] === 'yes';
-        update_post_meta($post_id, '_wc_cgm_popular', $popular ? 'yes' : 'no');
+        $popular = isset($_POST['welp_popular']) && $_POST['welp_popular'] === 'yes';
+        update_post_meta($post_id, '_welp_popular', $popular ? 'yes' : 'no');
 
-        if (isset($_POST['wc_cgm_specialization'])) {
-            update_post_meta($post_id, '_wc_cgm_specialization', sanitize_text_field($_POST['wc_cgm_specialization']));
+        if (isset($_POST['welp_specialization'])) {
+            update_post_meta($post_id, '_welp_specialization', sanitize_text_field($_POST['welp_specialization']));
         }
 
-        if (wc_cgm_tier_pricing_enabled() && isset($_POST['wc_cgm_tiers']) && is_array($_POST['wc_cgm_tiers'])) {
+        if (wc_cgm_tier_pricing_enabled() && isset($_POST['welp_tiers']) && is_array($_POST['welp_tiers'])) {
             $tiers = [];
-            foreach ($_POST['wc_cgm_tiers'] as $tier_data) {
+            foreach ($_POST['welp_tiers'] as $tier_data) {
                 $tiers[] = [
                     'tier_level' => absint($tier_data['tier_level'] ?? 0),
                     'tier_name' => sanitize_text_field($tier_data['tier_name'] ?? ''),

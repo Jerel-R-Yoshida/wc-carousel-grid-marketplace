@@ -21,6 +21,7 @@ class Plugin {
         $this->register_core_services();
         $this->init_hooks();
         $this->schedule_woocommerce_services();
+        $this->ensure_woocommerce_services_loaded_on_ajax();
     }
 
     private function register_core_services(): void {
@@ -38,6 +39,12 @@ class Plugin {
         } else {
             add_action('woocommerce_loaded', [$this, 'register_woocommerce_services']);
             add_action('plugins_loaded', [$this, 'register_woocommerce_services_fallback'], 20);
+        }
+    }
+
+    public function ensure_woocommerce_services_loaded_on_ajax(): void {
+        if (wp_doing_ajax()) {
+            add_action('plugins_loaded', [$this, 'register_woocommerce_services'], 5);
         }
     }
 

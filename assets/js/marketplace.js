@@ -2,6 +2,14 @@
     'use strict';
 
     var WC_CGM_Marketplace = {
+        debug: false,
+
+        log: function(...args) {
+            if (this.debug) {
+                console.log('[WC_CGM]', ...args);
+            }
+        },
+
         currentCategory: 0,
         currentTier: 0,
         currentOffset: 0,
@@ -156,9 +164,11 @@
             var $panel = $btn.closest('.wc-cgm-pricing-panel');
 
             var productId = $btn.data('product-id');
-            var tierLevel = $btn.data('tier-level') || 1;
-            var priceType = $btn.data('price-type') || 'hourly';
+            var tierLevel = $btn.data('tier-level') || 0;
+            var priceType = $btn.data('price-type') || 'simple';
             var quantity = parseInt($panel.find('.wc-cgm-quantity-input').val()) || 1;
+
+            WC_CGM_Marketplace.log('Add to cart:', { productId, tierLevel, priceType, quantity });
 
             $btn.addClass('loading');
             $btn.find('.wc-cgm-btn-text').text('Adding...');
@@ -174,6 +184,30 @@
                     tier_level: tierLevel,
                     price_type: priceType
                 },
+                success: function(response) {
+                    WC_CGM_Marketplace.log('Add to cart response:', response);
+                    if (response.success) {
+                        $btn.find('.wc-cgm-btn-text').text(wc_cgm_ajax.i18n.added_to_cart);
+                        $(document.body).trigger('wc_fragment_refresh');
+
+                        setTimeout(function() {
+                            $btn.find('.wc-cgm-btn-text').text('Add to Cart');
+                        }, 2000);
+                    } else {
+                        alert(response.data.message || wc_cgm_ajax.i18n.error);
+                        $btn.find('.wc-cgm-btn-text').text('Add to Cart');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    WC_CGM_Marketplace.log('AJAX error:', xhr, status, error);
+                    alert('Error: ' + error);
+                    $btn.find('.wc-cgm-btn-text').text('Add to Cart');
+                },
+                complete: function() {
+                    $btn.removeClass('loading');
+                }
+            });
+        },
                 success: function(response) {
                     if (response.success) {
                         $btn.find('.wc-cgm-btn-text').text(wc_cgm_ajax.i18n.added_to_cart);
