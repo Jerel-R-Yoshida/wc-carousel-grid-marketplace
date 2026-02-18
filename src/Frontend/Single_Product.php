@@ -93,22 +93,33 @@ class Single_Product {
         $tier_level = isset($_POST['wc_cgm_tier_level']) ? absint($_POST['wc_cgm_tier_level']) : 0;
         $price_type = isset($_POST['wc_cgm_price_type']) ? sanitize_text_field($_POST['wc_cgm_price_type']) : 'hourly';
 
-        if ($tier_level > 0) {
-            $plugin = wc_cgm();
-            $repository = $plugin->get_service('repository');
-            $tier = $repository->get_tier($product_id, $tier_level);
-
-            if ($tier) {
-                $price = $price_type === 'monthly' ? $tier->monthly_price : $tier->hourly_price;
-
-                $cart_item_data['wc_cgm_tier'] = [
-                    'level' => $tier_level,
-                    'name' => $tier->tier_name,
-                    'price' => (float) $price,
-                    'price_type' => $price_type,
-                ];
-            }
+        if ($tier_level <= 0) {
+            throw new Exception(__('Please select an experience level.', 'wc-carousel-grid-marketplace'));
         }
+
+        $plugin = wc_cgm();
+        $repository = $plugin->get_service('repository');
+        $tier = $repository->get_tier($product_id, $tier_level);
+
+        if (!$tier) {
+            throw new Exception(__('Invalid experience level selected.', 'wc-carousel-grid-marketplace'));
+        }
+
+        $price = $price_type === 'monthly' ? $tier->monthly_price : $tier->hourly_price;
+
+        if ($price <= 0) {
+            throw new Exception(sprintf(
+                __('%s pricing is not available for this experience level.', 'wc-carousel-grid-marketplace'),
+                $price_type === 'monthly' ? __('Monthly', 'wc-carousel-grid-marketplace') : __('Hourly', 'wc-carousel-grid-marketplace')
+            ));
+        }
+
+        $cart_item_data['wc_cgm_tier'] = [
+            'level' => $tier_level,
+            'name' => $tier->tier_name,
+            'price' => (float) $price,
+            'price_type' => $price_type,
+        ];
 
         return $cart_item_data;
     }

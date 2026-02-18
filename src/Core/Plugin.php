@@ -129,6 +129,9 @@ class Plugin {
             'i18n' => [
                 'added_to_cart' => __('Added to cart!', 'wc-carousel-grid-marketplace'),
                 'error' => __('An error occurred. Please try again.', 'wc-carousel-grid-marketplace'),
+                'select_tier' => __('Please select an experience level before adding to cart.', 'wc-carousel-grid-marketplace'),
+                'invalid_tier' => __('Selected experience level is not available for this product.', 'wc-carousel-grid-marketplace'),
+                'invalid_price_type' => __('Pricing option is not available for this experience level. Please select a different option.', 'wc-carousel-grid-marketplace'),
             ],
         ]);
 

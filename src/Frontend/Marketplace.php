@@ -37,12 +37,29 @@ class Marketplace {
         $specialization = get_post_meta($product_id, '_welp_specialization', true);
         $tiers = $tiers ?? [];
 
-        $default_tier = !empty($tiers) ? $tiers[0] : null;
+        $tier_data = [
+            1 => ['hourly' => 0, 'monthly' => 0, 'name' => 'Entry'],
+            2 => ['hourly' => 0, 'monthly' => 0, 'name' => 'Mid'],
+            3 => ['hourly' => 0, 'monthly' => 0, 'name' => 'Expert'],
+        ];
+
+        foreach ($tiers as $tier) {
+            $tier_data[$tier->tier_level] = [
+                'hourly' => (float) ($tier->hourly_price ?? 0),
+                'monthly' => (float) ($tier->monthly_price ?? 0),
+                'name' => $tier->tier_name ?? '',
+            ];
+        }
+
+        $default_tier = null;
         foreach ($tiers as $tier) {
             if ($tier->hourly_price > 0 || $tier->monthly_price > 0) {
                 $default_tier = $tier;
                 break;
             }
+        }
+        if (!$default_tier && !empty($tiers)) {
+            $default_tier = $tiers[0];
         }
 
         $price_types = [];
@@ -59,12 +76,13 @@ class Marketplace {
 ?>
         <div class="wc-cgm-pricing-panel"
              data-product-id="<?php echo esc_attr($product_id); ?>"
-             data-default-tier="<?php echo esc_attr($default_tier->tier_level ?? 1); ?>"
+             data-default-tier="<?php echo esc_attr($default_tier->tier_level ?? 0); ?>"
              data-default-price-type="<?php echo esc_attr($default_price_type); ?>"
-             <?php foreach ($tiers as $tier) : ?>
-             data-tier-<?php echo esc_attr($tier->tier_level); ?>-hourly="<?php echo esc_attr($tier->hourly_price ?? 0); ?>"
-             data-tier-<?php echo esc_attr($tier->tier_level); ?>-monthly="<?php echo esc_attr($tier->monthly_price ?? 0); ?>"
-             data-tier-<?php echo esc_attr($tier->tier_level); ?>-name="<?php echo esc_attr($tier->tier_name ?? ''); ?>"
+             data-has-tiers="<?php echo !empty($tiers) ? 'true' : 'false'; ?>"
+             <?php foreach ([1, 2, 3] as $level) : ?>
+             data-tier-<?php echo esc_attr($level); ?>-hourly="<?php echo esc_attr($tier_data[$level]['hourly']); ?>"
+             data-tier-<?php echo esc_attr($level); ?>-monthly="<?php echo esc_attr($tier_data[$level]['monthly']); ?>"
+             data-tier-<?php echo esc_attr($level); ?>-name="<?php echo esc_attr($tier_data[$level]['name']); ?>"
              <?php endforeach; ?>>
 
             <?php if (count($price_types) > 1) : ?>

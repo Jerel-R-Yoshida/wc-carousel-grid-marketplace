@@ -133,25 +133,27 @@ _Screenshots to be added_
 
 ## Changelog
 
+### 1.0.8 - 2026-02-18
+* Fixed tier selection validation for Entry and Expert levels
+* Added server-side and client-side validation in add-to-cart flow
+* Enhanced error messages for invalid tier/price type selections
+
+### 1.0.7 - 2026-02-18
+* Development update
+
+### 1.0.6 - 2026-02-18
+* Fixed monthly price display when switching price types
+* Fixed WooCommerce cart integration with proper error handling
+* Removed pricing header section from product cards
+* Enhanced AJAX add to cart with cart totals calculation
+
+### 1.0.5 - 2026-02-18
+* Development update
+
 ### 1.0.4 - 2026-02-18
-- Fixed PHP syntax errors in Admin_Manager, Repository, Marketplace_Widget, and Marketplace
-- Enhanced admin settings and product meta box functionality
-- Improved marketplace display with better pricing panel handling
-- Updated Elementor widget with proper method declarations
-- Enhanced WooCommerce hooks integration
-
-### 1.0.3 - 2026-02-18
-- Fixed Elementor widget registration timing issue
-- Fixed product meta box not loading without tier pricing enabled
-- Added marketplace_only toggle to show all WC products by default
-- Added admin notice when no products found
-- Tier pricing tables now created on activation (regardless of setting)
-- Enhanced Elementor editor preview with status indicators
-
-### 1.0.2 - 2026-02-18
-- Development update
-
-_Full changelog available in readme.txt_
+* Fixed PHP syntax errors in Admin_Manager, Repository, Marketplace_Widget, and Marketplace
+* Enhanced admin settings and product meta box functionality
+* Improved marketplace display with better pricing panel handling
 
 ## Credits
 

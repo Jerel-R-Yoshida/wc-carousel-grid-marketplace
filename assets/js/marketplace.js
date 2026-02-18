@@ -209,11 +209,31 @@
             var $panel = $btn.closest('.wc-cgm-pricing-panel');
 
             var productId = $btn.data('product-id');
-            var tierLevel = $btn.data('tier-level') || 0;
-            var priceType = $btn.data('price-type') || 'simple';
+            var tierLevel = parseInt($btn.data('tier-level')) || 0;
+            var priceType = $btn.data('price-type') || 'hourly';
             var quantity = parseInt($panel.find('.wc-cgm-quantity-input').val()) || 1;
 
             WC_CGM_Marketplace.log('Add to cart:', { productId, tierLevel, priceType, quantity });
+
+            var hasTiers = $card.data('has-tiers') || $panel.data('has-tiers');
+            if (hasTiers === 'true' || hasTiers === true) {
+                if (tierLevel <= 0) {
+                    alert(wc_cgm_ajax.i18n.select_tier || 'Please select an experience level.');
+                    return;
+                }
+
+                var hourlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-hourly')) || 0;
+                var monthlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-monthly')) || 0;
+                var selectedPrice = priceType === 'monthly' ? monthlyPrice : hourlyPrice;
+
+                if (selectedPrice <= 0) {
+                    var errorMsg = priceType === 'monthly'
+                        ? 'Monthly pricing is not available for this experience level.'
+                        : 'Hourly pricing is not available for this experience level.';
+                    alert(wc_cgm_ajax.i18n.invalid_price_type || errorMsg);
+                    return;
+                }
+            }
 
             $btn.addClass('loading');
             $btn.find('.wc-cgm-btn-text').text('Adding...');
