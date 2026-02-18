@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.10
+Stable tag: 1.0.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,6 +87,16 @@ Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
 
+
+== 1.0.12 ==
+Released: 2026-02-19
+
+* Fixed price type toggle buttons: Monthly defaults to green, Hourly inactive is gray
+* Clicking toggles green highlight between Monthly/Hourly buttons
+== 1.0.11 ==
+Released: 2026-02-19
+
+* Development update
 == 1.0.10 ==
 Released: 2026-02-19
 

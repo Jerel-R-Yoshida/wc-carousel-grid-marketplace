@@ -299,15 +299,27 @@
 
 .wc-cgm-price-type-btn {
     padding: 6px 12px;
-    border: 1px solid #22c55e;
+    border: 1px solid #e5e7eb;
     border-radius: 6px;
-    background: #22c55e;
-    color: #fff;
+    background: #fff;
+    color: #6b7280;
     font-size: 12px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .wc-cgm-price-type-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.wc-cgm-price-type-btn.active {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+}
+
+.wc-cgm-price-type-btn.active:hover {
     background: #16a34a;
     border-color: #16a34a;
 }

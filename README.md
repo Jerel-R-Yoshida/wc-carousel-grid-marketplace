@@ -133,6 +133,13 @@ _Screenshots to be added_
 
 ## Changelog
 
+### 1.0.12 - 2026-02-19
+* Fixed price type toggle buttons: Monthly defaults to green, Hourly inactive is gray
+* Clicking toggles green highlight between Monthly/Hourly buttons
+
+### 1.0.11 - 2026-02-19
+* Development update
+
 ### 1.0.10 - 2026-02-19
 * Removed "All" option from experience level filter - Entry is now default
 * Price display shows opposite rate (Monthly→hourly equiv, Hourly→monthly equiv)
