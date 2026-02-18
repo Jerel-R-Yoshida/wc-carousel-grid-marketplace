@@ -34,8 +34,8 @@ define('WC_CGM_PLUGIN_FILE', __FILE__);
 define('WC_CGM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WC_CGM_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WC_CGM_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('WC_CGM_TABLE_TIERS', 'wc_cgm_product_tiers');
-define('WC_CGM_TABLE_SALES', 'wc_cgm_order_tier_sales');
+define('WC_CGM_TABLE_TIERS', 'welp_product_tiers');
+define('WC_CGM_TABLE_SALES', 'welp_order_tier_sales');
 
 spl_autoload_register('wc_cgm_autoloader');
 
@@ -61,18 +61,18 @@ function wc_cgm(): WC_CGM\Core\Plugin {
 }
 
 function wc_cgm_tier_pricing_enabled(): bool {
-    return (bool) get_option('wc_cgm_enable_tier_pricing', false);
+    return (bool) get_option('welp_enable_tier_pricing', false);
 }
 
 function wc_cgm_is_marketplace_product(int $product_id): bool {
-    return get_post_meta($product_id, '_wc_cgm_enabled', true) === 'yes';
+    return get_post_meta($product_id, '_welp_enabled', true) === 'yes';
 }
 
 function wc_cgm_is_popular(int $product_id): bool {
-    $method = get_option('wc_cgm_popular_method', 'auto');
+    $method = get_option('welp_popular_method', 'auto');
     
     if ($method === 'manual' || $method === 'both') {
-        if (get_post_meta($product_id, '_wc_cgm_popular', true) === 'yes') {
+        if (get_post_meta($product_id, '_welp_popular', true) === 'yes') {
             return true;
         }
     }

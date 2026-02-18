@@ -122,16 +122,24 @@ class WooCommerce_Hooks {
     }
 
     public function ajax_add_to_cart(): void {
+        wc_cgm_log('WC_CGM: AJAX add_to_cart called');
+        wc_cgm_log('WC_CGM: POST data:', $_POST);
+
         check_ajax_referer('wc_cgm_frontend_nonce', 'nonce');
 
         $product_id = isset($_POST['product_id']) ? absint($_POST['product_id']) : 0;
         $quantity = isset($_POST['quantity']) ? absint($_POST['quantity']) : 1;
         $tier_level = isset($_POST['tier_level']) ? absint($_POST['tier_level']) : 0;
-        $price_type = isset($_POST['price_type']) ? sanitize_text_field($_POST['price_type']) : 'hourly';
+        $price_type = isset($_POST['price_type']) ? sanitize_text_field($_POST['price_type']) : 'simple';
 
         if ($product_id <= 0) {
             wp_send_json_error(['message' => __('Invalid product.', 'wc-carousel-grid-marketplace')]);
         }
+
+        wc_cgm_log('WC_CGM: Adding product ID: ' . $product_id);
+        wc_cgm_log('WC_CGM: Tier level: ' . $tier_level);
+        wc_cgm_log('WC_CGM: Price type: ' . $price_type);
+        wc_cgm_log('WC_CGM: Quantity: ' . $quantity);
 
         $cart_item_data = [];
 
@@ -152,16 +160,26 @@ class WooCommerce_Hooks {
             }
         }
 
-        $result = WC()->cart->add_to_cart($product_id, $quantity, 0, [], $cart_item_data);
+        wc_cgm_log('WC_CGM: Cart item data:', $cart_item_data);
 
-        if (is_wp_error($result)) {
-            wp_send_json_error(['message' => $result->get_error_message()]);
+        try {
+            $result = WC()->cart->add_to_cart($product_id, $quantity, 0, [], $cart_item_data);
+
+            if (is_wp_error($result)) {
+                wc_cgm_log('WC_CGM: add_to_cart WP Error: ' . $result->get_error_message());
+                wp_send_json_error(['message' => $result->get_error_message()]);
+            }
+
+            wc_cgm_log('WC_CGM: Product added successfully. Cart hash: ' . WC()->cart->get_cart_hash());
+
+            wp_send_json_success([
+                'message' => __('Product added to cart!', 'wc-carousel-grid-marketplace'),
+                'cart_hash' => WC()->cart->get_cart_hash(),
+            ]);
+        } catch (Exception $e) {
+            wc_cgm_log('WC_CGM: add_to_cart Exception: ' . $e->getMessage());
+            wp_send_json_error(['message' => $e->getMessage()]);
         }
-
-        wp_send_json_success([
-            'message' => __('Product added to cart!', 'wc-carousel-grid-marketplace'),
-            'cart_hash' => WC()->cart->get_cart_hash(),
-        ]);
     }
 
     public function ajax_load_more(): void {

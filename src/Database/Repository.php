@@ -32,8 +32,8 @@ class Repository {
         ];
 
         $args = wp_parse_args($args, $defaults);
-        $cache_key = 'wc_cgm_products_' . md5(wp_json_encode($args));
-        $cached = wp_cache_get($cache_key, 'wc_cgm');
+        $cache_key = 'welp_products_' . md5(wp_json_encode($args));
+        $cached = wp_cache_get($cache_key, 'welp');
 
         if (false !== $cached) {
             return $cached;
@@ -135,7 +135,7 @@ class Repository {
         $query = new \WP_Query($query_args);
         $products = $query->posts;
 
-        wp_cache_set($cache_key, $products, 'wc_cgm', HOUR_IN_SECONDS);
+        wp_cache_set($cache_key, $products, 'welp', HOUR_IN_SECONDS);
 
         return $products;
     }
@@ -176,8 +176,9 @@ class Repository {
                 'posts_per_page' => $limit,
                 'meta_query' => [
                     [
-                        'key' => '_wc_cgm_popular',
+                        'key' => '_welp_popular',
                         'value' => 'yes',
+                        'compare' => '=',
                     ],
                 ],
                 'fields' => 'ids',
@@ -197,7 +198,7 @@ class Repository {
             FROM {$this->wpdb->postmeta} pm 
             INNER JOIN {$this->wpdb->prefix}woocommerce_order_items oi ON oi.order_item_name = pm.meta_value
             INNER JOIN {$this->wpdb->prefix}posts p ON p.ID = oi.order_id
-            WHERE pm.meta_key = '_product_id'
+            WHERE pm.meta_key = '_welp_product_id'
             AND p.post_status IN ('wc-completed', 'wc-processing')
             AND p.post_date >= %s
             GROUP BY pm.post_id
@@ -246,13 +247,14 @@ class Repository {
                         'terms' => $category->term_id,
                     ],
                 ],
-                'meta_query' => [
-                    [
-                        'key' => '_wc_cgm_enabled',
-                        'value' => 'yes',
-                    ],
+            'meta_query' => [
+                [
+                    'key' => '_welp_enabled',
+                    'value' => 'yes',
+                    'compare' => '=',
                 ],
-            ];
+            ],
+        ];
 
             $query = new \WP_Query($args);
             $count = $query->found_posts;
@@ -263,7 +265,7 @@ class Repository {
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'count' => $count,
-                    'icon' => get_term_meta($category->term_id, 'wc_cgm_icon', true) ?: '',
+                    'icon' => get_term_meta($category->term_id, 'welp_icon', true) ?: '',
                 ];
                 $total_count += $count;
             }
@@ -286,11 +288,11 @@ class Repository {
     }
 
     public function is_marketplace_enabled(int $product_id): bool {
-        return get_post_meta($product_id, '_wc_cgm_enabled', true) === 'yes';
+        return get_post_meta($product_id, '_welp_enabled', true) === 'yes';
     }
 
     public function get_specialization(int $product_id): string {
-        return get_post_meta($product_id, '_wc_cgm_specialization', true) ?: '';
+        return get_post_meta($product_id, '_welp_specialization', true) ?: '';
     }
 
     public function get_tiers_by_product(int $product_id): array {
@@ -298,8 +300,8 @@ class Repository {
             return [];
         }
 
-        $cache_key = "wc_cgm_tiers_{$product_id}";
-        $cached = wp_cache_get($cache_key, 'wc_cgm');
+        $cache_key = "welp_tiers_{$product_id}";
+        $cached = wp_cache_get($cache_key, 'welp');
 
         if (false !== $cached) {
             return $cached;
@@ -310,7 +312,7 @@ class Repository {
             $product_id
         ));
 
-        wp_cache_set($cache_key, $results, 'wc_cgm', HOUR_IN_SECONDS);
+        wp_cache_set($cache_key, $results, 'welp', HOUR_IN_SECONDS);
 
         return $results;
     }

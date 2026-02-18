@@ -25,7 +25,48 @@ class Marketplace_Widget extends Widget_Base {
     }
 
     public function get_categories(): array {
-        return ['wc-carousel-grid', 'woocommerce'];
+        return ['welp-marketplace', 'woocommerce'];
+    }
+
+    private function get_product_categories(): array {
+        $categories = get_terms([
+            'taxonomy' => 'product_cat',
+            'hide_empty' => true,
+        ]);
+
+        if (is_wp_error($categories)) {
+            return [];
+        }
+
+        $options = [];
+        foreach ($categories as $category) {
+            $options[$category->term_id] = $category->name;
+        }
+
+        return $options;
+    }
+
+    private function get_marketplace_products(): array {
+        $args = [
+            'post_type' => 'product',
+            'post_status' => 'publish',
+            'posts_per_page' => 100,
+            'meta_query' => [
+                [
+                    'key' => '_welp_enabled',
+                    'value' => 'yes',
+                ],
+            ],
+        ];
+
+        $query = new \WP_Query($args);
+        $options = [];
+
+        foreach ($query->posts as $post) {
+            $options[$post->ID] = $post->post_title;
+        }
+
+        return $options;
     }
 
     public function get_keywords(): array {
@@ -511,7 +552,7 @@ class Marketplace_Widget extends Widget_Base {
                     </small>
                 <# } #>
             </div>
-        </div>
+         </div>
         <?php
     }
 
@@ -523,46 +564,5 @@ class Marketplace_Widget extends Widget_Base {
             }
         }
         return implode(' ', $parts);
-    }
-
-    private function get_product_categories(): array {
-        $categories = get_terms([
-            'taxonomy' => 'product_cat',
-            'hide_empty' => true,
-        ]);
-
-        if (is_wp_error($categories)) {
-            return [];
-        }
-
-        $options = [];
-        foreach ($categories as $category) {
-            $options[$category->term_id] = $category->name;
-        }
-
-        return $options;
-    }
-
-    private function get_marketplace_products(): array {
-        $args = [
-            'post_type' => 'product',
-            'post_status' => 'publish',
-            'posts_per_page' => 100,
-            'meta_query' => [
-                [
-                    'key' => '_wc_cgm_enabled',
-                    'value' => 'yes',
-                ],
-            ],
-        ];
-
-        $query = new \WP_Query($args);
-        $options = [];
-
-        foreach ($query->posts as $post) {
-            $options[$post->ID] = $post->post_title;
-        }
-
-        return $options;
     }
 }
