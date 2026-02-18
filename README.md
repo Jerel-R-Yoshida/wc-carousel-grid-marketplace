@@ -97,7 +97,7 @@ The marketplace features a global experience level selector that affects all pro
 
 ```
 +-------------------------------------------------------------+
-|  Experience Level:  [All] [Entry] [Mid] [Expert]            |  <- Global filter bar
+|  Experience Level:  [Entry] [Mid] [Expert]                     |  <- Global filter bar (Entry default)
 +-------------------------------------------------------------+
 |  +------------------+  +------------------+                  |
 |  | [Entry] Senior   |  | [Entry] Full-Stack|                 |  <- Badge before title
@@ -132,6 +132,14 @@ The marketplace features a global experience level selector that affects all pro
 _Screenshots to be added_
 
 ## Changelog
+
+### 1.0.10 - 2026-02-19
+* Removed "All" option from experience level filter - Entry is now default
+* Price display shows opposite rate (Monthly→hourly equiv, Hourly→monthly equiv)
+* Price type buttons always green (#22c55e)
+* Removed hover transition from card description
+* Cart always uses monthly pricing
+* Enhanced add-to-cart validation
 
 ### 1.0.9 - 2026-02-18
 * Fixed fatal error "Class Exception not found" in Single_Product.php

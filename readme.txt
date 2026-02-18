@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,6 +86,17 @@ Yes! There's a native Elementor widget with full design controls.
 Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
+
+== 1.0.10 ==
+Released: 2026-02-19
+
+* Removed "All" option from experience level filter - Entry is now default
+* Price display now shows opposite rate: Monthly shows hourly equivalent, Hourly shows monthly equivalent
+* Price type buttons (Monthly/Hourly) now always display green (#22c55e)
+* Removed hover transition effect from card description
+* Fixed font-size override for card description to prevent theme conflicts
+* Cart always uses monthly pricing regardless of selected price type
+* Enhanced add-to-cart validation with clear error messages
 
 == 1.0.9 ==
 Released: 2026-02-18

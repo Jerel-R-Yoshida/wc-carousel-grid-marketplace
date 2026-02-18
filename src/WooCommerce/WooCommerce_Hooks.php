@@ -168,21 +168,17 @@ class WooCommerce_Hooks {
                 return;
             }
 
-            $price = $price_type === 'monthly' ? $tier->monthly_price : $tier->hourly_price;
+            $price = $tier->monthly_price;
+            $price_type = 'monthly';
 
             if ($price <= 0) {
-                wc_cgm_log('[WELP] Invalid price for tier', [
+                wc_cgm_log('[WELP] Monthly price not set for tier', [
                     'product_id' => $product_id,
                     'tier_level' => $tier_level,
-                    'price_type' => $price_type,
                     'monthly_price' => $tier->monthly_price,
-                    'hourly_price' => $tier->hourly_price,
                 ]);
                 wp_send_json_error([
-                    'message' => sprintf(
-                        __('%s pricing is not available for this experience level. Please select a different pricing option.', 'wc-carousel-grid-marketplace'),
-                        $price_type === 'monthly' ? __('Monthly', 'wc-carousel-grid-marketplace') : __('Hourly', 'wc-carousel-grid-marketplace')
-                    )
+                    'message' => __('Monthly pricing is not available for this experience level.', 'wc-carousel-grid-marketplace')
                 ]);
                 return;
             }

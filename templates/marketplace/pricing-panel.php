@@ -53,12 +53,14 @@ $default_price = $default_tier ? ($default_price_type === 'monthly' ? $default_t
         </span>
         <span class="wc-cgm-price-sub">
             <?php if ($default_price_type === 'monthly') : ?>
-                <?php esc_html_e('/month', 'wc-carousel-grid-marketplace'); ?>
+                <?php 
+                $hourly_equiv = $default_price / 160;
+                echo wc_price($hourly_equiv) . '/hr'; 
+                ?>
             <?php else : ?>
                 <?php 
-                $hourly = $default_price;
-                $monthly = $hourly * 160;
-                echo wc_price($monthly) . '/mo';
+                $monthly_equiv = $default_price * 160;
+                echo wc_price($monthly_equiv) . '/mo'; 
                 ?>
             <?php endif; ?>
         </span>

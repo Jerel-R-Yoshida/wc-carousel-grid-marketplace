@@ -244,9 +244,16 @@
 
 .wc-cgm-card-desc {
     margin: 0 0 16px 0;
-    font-size: 14px;
+    font-size: 14px !important;
     line-height: 1.5;
     color: var(--wc-cgm-text-medium, #6b7280);
+    transition: none;
+}
+
+.wc-cgm-card-desc a,
+.wc-cgm-card-desc a:hover,
+.wc-cgm-card p:hover {
+    font-size: 14px !important;
 }
 
 .wc-cgm-pricing-panel {
@@ -292,22 +299,17 @@
 
 .wc-cgm-price-type-btn {
     padding: 6px 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #22c55e;
     border-radius: 6px;
-    background: #fff;
+    background: #22c55e;
+    color: #fff;
     font-size: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .wc-cgm-price-type-btn:hover {
-    background: #f9fafb;
-}
-
-.wc-cgm-price-type-btn.active {
-    background: var(--wc-cgm-primary, #22c55e);
-    border-color: var(--wc-cgm-primary, #22c55e);
-    color: #fff;
+    background: #16a34a;
+    border-color: #16a34a;
 }
 
 .wc-cgm-pricing-amount {
