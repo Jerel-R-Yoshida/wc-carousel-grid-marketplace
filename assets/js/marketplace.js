@@ -314,8 +314,7 @@
             $panel.find('.wc-cgm-total-price').data('total', total);
 
             var formattedTotal = WC_CGM_Marketplace.formatPrice(total);
-            var priceType = $panel.find('.wc-cgm-price-type-btn.active').data('price-type') || 'monthly';
-            $panel.find('.wc-cgm-total-price').html(formattedTotal + '/' + (priceType === 'monthly' ? 'mo' : 'hr'));
+            $panel.find('.wc-cgm-total-price').html(formattedTotal + '/mo');
         },
 
         updateTierPrice: function(e) {
