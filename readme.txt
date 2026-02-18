@@ -1,5 +1,5 @@
 === WooCommerce Carousel/Grid Marketplace ===
-Contributors: jerelryoshida-dot
+Contributors: Jerel-R-Yoshida
 Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pricing
 Requires at least: 5.8
 Tested up to: 6.4

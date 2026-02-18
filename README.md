@@ -102,9 +102,9 @@ _Screenshots to be added_
 
 ## Credits
 
-- **Author**: [Jerel Yoshida](https://github.com/jerelryoshida-dot)
+- **Author**: [Jerel Yoshida](https://github.com/Jerel-R-Yoshida)
 - **License**: GPL v2 or later
 
 ## Support
 
-For bug reports and feature requests, please use the [GitHub Issues](https://github.com/jerelryoshida-dot/wc-carousel-grid-marketplace/issues) page.
+For bug reports and feature requests, please use the [GitHub Issues](https://github.com/Jerel-R-Yoshida/wc-carousel-grid-marketplace/issues) page.
