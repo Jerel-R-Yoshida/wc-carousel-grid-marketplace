@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Carousel/Grid Marketplace
  * Plugin URI: https://github.com/Jerel-R-Yoshida/wc-carousel-grid-marketplace
  * Description: Service marketplace with carousel/grid layout, optional tiered pricing, and Elementor compatibility.
- * Version: 1.0.14
+ * Version: 1.0.15
  * Author: Jerel Yoshida
  * Author URI: https://github.com/Jerel-R-Yoshida
  * Text Domain: wc-carousel-grid-marketplace
