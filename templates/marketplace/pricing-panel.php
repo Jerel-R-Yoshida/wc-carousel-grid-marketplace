@@ -16,8 +16,8 @@ foreach ($tiers as $tier) {
 
 $price_types = [];
 foreach ($tiers as $tier) {
-    if ($tier->hourly_price > 0) $price_types['hourly'] = true;
     if ($tier->monthly_price > 0) $price_types['monthly'] = true;
+    if ($tier->hourly_price > 0) $price_types['hourly'] = true;
 }
 $price_types = array_keys($price_types);
 $default_price_type = 'monthly';
@@ -35,7 +35,8 @@ $default_price = $default_tier ? $default_tier->monthly_price : 0;
      data-tier-<?php echo esc_attr($tier->tier_level); ?>-name="<?php echo esc_attr($tier->tier_name ?? ''); ?>"
      <?php endforeach; ?>>
 
-    <?php if (count($price_types) > 1) : ?>
+     <?php if (count($price_types) > 1) : ?>
+    <h4 class="wc-cgm-tier-description"><?php echo esc_html($default_tier->description ?? ''); ?></h4>
     <div class="wc-cgm-price-type-selector">
         <?php foreach ($price_types as $type) : ?>
         <button type="button"

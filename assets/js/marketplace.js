@@ -79,10 +79,12 @@
                 var $card = $(this);
                 var $panel = $card.find('.wc-cgm-pricing-panel');
                 var $badge = $card.find('.wc-cgm-tier-badge');
+                var $cardDesc = $card.find('.wc-cgm-card-desc');
                 
                 var hourlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-hourly')) || 0;
                 var monthlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-monthly')) || 0;
                 var tierName = $panel.data('tier-' + tierLevel + '-name') || '';
+                var tierDescription = $panel.data('tier-' + tierLevel + '-description') || '';
                 
                 if (hourlyPrice <= 0 && monthlyPrice <= 0) {
                     $card.hide();
@@ -108,6 +110,12 @@
                     .removeClass('entry mid expert default')
                     .addClass(badgeClass)
                     .text(tierName);
+                
+                if (tierDescription) {
+                    $cardDesc.text(tierDescription);
+                }
+                
+                $panel.find('.wc-cgm-tier-description').text(tierDescription);
                 
                 $panel.find('.wc-cgm-quantity-input').trigger('change');
             });

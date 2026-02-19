@@ -10,12 +10,12 @@ $default_tier = $default_tier ?? null;
     <?php if (count($price_types) > 1) : ?>
     <div class="wc-cgm-price-type-toggle">
         <label class="wc-cgm-toggle-label">
-            <input type="radio" name="wc_cgm_price_type" value="hourly" checked>
-            <?php esc_html_e('Hourly', 'wc-carousel-grid-marketplace'); ?>
+            <input type="radio" name="wc_cgm_price_type" value="monthly" checked>
+            <?php esc_html_e('Monthly', 'wc-carousel-grid-marketplace'); ?>
         </label>
         <label class="wc-cgm-toggle-label">
-            <input type="radio" name="wc_cgm_price_type" value="monthly">
-            <?php esc_html_e('Monthly', 'wc-carousel-grid-marketplace'); ?>
+            <input type="radio" name="wc_cgm_price_type" value="hourly">
+            <?php esc_html_e('Hourly', 'wc-carousel-grid-marketplace'); ?>
         </label>
     </div>
     <?php else : ?>
