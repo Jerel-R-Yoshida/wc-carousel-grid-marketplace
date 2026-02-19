@@ -133,6 +133,13 @@ _Screenshots to be added_
 
 ## Changelog
 
+### 1.0.32 - 2026-02-20
+* Fixed: Add-to-cart now works correctly with WELP (WooCommerce Experience Level Pricing)
+* Fixed: JavaScript sends WELP-expected field names (welp_selected_tier, welp_tier_name, etc.)
+* Fixed: PHP sets $_POST fields before add_to_cart() so WELP can detect tier selection
+* Changed: Removed redundant add_welp_compatible_meta filter
+* Changed: Cart/checkout display now reads from welp_tier instead of wc_cgm_tier
+
 ### 1.0.31 - 2026-02-20
 * Added: Comprehensive debug logging for add-to-cart troubleshooting
 * Added: WELP-compatible meta keys for cart item data

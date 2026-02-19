@@ -12,7 +12,6 @@ class WooCommerce_Hooks {
         add_action('woocommerce_order_status_processing', [$this, 'record_sale']);
         add_action('woocommerce_order_status_completed', [$this, 'record_sale']);
 
-        add_filter('woocommerce_add_cart_item_data', [$this, 'add_welp_compatible_meta'], 10, 3);
         add_action('woocommerce_checkout_create_order_line_item', [$this, 'add_tier_to_order_item'], 10, 4);
 
         add_action('wp_ajax_wc_cgm_filter_products', [$this, 'ajax_filter_products']);
@@ -35,28 +34,35 @@ class WooCommerce_Hooks {
 
     public function update_cart_item_price(\WC_Cart $cart): void {
         foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
-            if (isset($cart_item['wc_cgm_tier'])) {
-                $tier = $cart_item['wc_cgm_tier'];
-                $cart_item['data']->set_price($tier['price']);
+            if (isset($cart_item['welp_tier'])) {
+                $tier = $cart_item['welp_tier'];
+                $tier_price = (float) ($tier['price'] ?? 0);
+                if ($tier_price > 0) {
+                    $cart_item['data']->set_price($tier_price);
+                }
             }
         }
     }
 
     public function display_tier_in_cart_checkout(array $item_data, array $cart_item): array {
-        if (!isset($cart_item['wc_cgm_tier'])) {
+        if (!isset($cart_item['welp_tier'])) {
             return $item_data;
         }
 
-        $tier = $cart_item['wc_cgm_tier'];
+        $tier = $cart_item['welp_tier'];
 
         $item_data[] = [
             'key' => __('Experience Level', 'wc-carousel-grid-marketplace'),
-            'value' => $tier['name'],
+            'value' => $tier['name'] ?? '',
         ];
+
+        $price = (float) ($tier['price'] ?? 0);
+        $price_type = $tier['price_type'] ?? 'monthly';
+        $suffix = $price_type === 'hourly' ? '/hr' : '/mo';
 
         $item_data[] = [
             'key' => __('Pricing', 'wc-carousel-grid-marketplace'),
-            'value' => wc_price($tier['price']) . '/' . ($tier['price_type'] === 'monthly' ? 'mo' : 'hr'),
+            'value' => wc_price($price) . $suffix,
         ];
 
         return $item_data;
@@ -74,16 +80,17 @@ class WooCommerce_Hooks {
         }
 
         foreach ($order->get_items() as $item_id => $item) {
-            $tier_level = $item->get_meta('_wc_cgm_tier_level');
-            $tier_price = $item->get_meta('_wc_cgm_tier_price');
-            $tier_price_type = $item->get_meta('_wc_cgm_tier_price_type');
+            $tier_level = $item->get_meta('_welp_tier_level');
+            $tier_price = $item->get_meta('_welp_tier_price');
+            $tier_price_type = $item->get_meta('_welp_price_type');
+            $tier_name = $item->get_meta('_welp_tier_name');
 
             if ($tier_level && $tier_price) {
                 $welp_repo->record_tier_sale(
                     $order_id,
                     $item->get_product_id(),
                     (int) $tier_level,
-                    $item->get_meta(__('Experience Level', 'wc-carousel-grid-marketplace')) ?: 'Tier',
+                    $tier_name ?: 'Tier',
                     (float) $tier_price,
                     $tier_price_type ?: 'monthly',
                     $item->get_quantity()
@@ -143,7 +150,6 @@ class WooCommerce_Hooks {
             'price_type' => $price_type,
             'is_marketplace_product' => function_exists('wc_cgm_is_marketplace_product') ? wc_cgm_is_marketplace_product($product_id) : 'function not exists',
             'welp_enabled' => function_exists('welp_is_enabled') ? welp_is_enabled($product_id) : 'function not exists',
-            'POST_data' => $_POST,
         ]);
 
         if ($product_id <= 0) {
@@ -157,8 +163,6 @@ class WooCommerce_Hooks {
             wp_send_json_error(['message' => __('Cart not available.', 'wc-carousel-grid-marketplace')]);
             return;
         }
-
-        $cart_item_data = [];
 
         if (wc_cgm_is_marketplace_product($product_id)) {
             $this->log('Product is marketplace product', ['product_id' => $product_id, 'tier_level' => $tier_level]);
@@ -179,7 +183,6 @@ class WooCommerce_Hooks {
                 'product_id' => $product_id,
                 'tier_level' => $tier_level,
                 'tier_found' => $tier ? 'yes' : 'no',
-                'tier_data' => $tier ? (array) $tier : null,
             ]);
 
             if (!$tier) {
@@ -200,25 +203,25 @@ class WooCommerce_Hooks {
                 return;
             }
 
-            $cart_item_data['wc_cgm_tier'] = [
-                'level' => $tier_level,
-                'name' => $tier->tier_name,
-                'price' => (float) $price,
-                'price_type' => $price_type,
-            ];
+            $_POST['welp_selected_tier'] = $tier_level;
+            $_POST['welp_tier_name'] = $tier->tier_name;
+            $_POST['welp_tier_price'] = (float) $price;
+            $_POST['welp_price_type'] = $price_type;
 
-            $cart_item_data['_welp_tier_level'] = $tier_level;
-            $cart_item_data['_welp_tier_price'] = (float) $price;
-            $cart_item_data['_welp_tier_price_type'] = $price_type;
-            $cart_item_data['_welp_tier_name'] = $tier->tier_name;
-
-            $this->log('Cart item data prepared', ['cart_item_data' => $cart_item_data]);
+            $this->log('Set WELP POST fields for Cart_Integration', [
+                'welp_selected_tier' => $tier_level,
+                'welp_tier_name' => $tier->tier_name,
+                'welp_tier_price' => $price,
+                'welp_price_type' => $price_type,
+            ]);
         }
+
+        $cart_item_data = [];
 
         $this->log('Calling WC()->cart->add_to_cart', [
             'product_id' => $product_id,
             'quantity' => $quantity,
-            'cart_item_data' => $cart_item_data,
+            'welp_post_fields_set' => isset($_POST['welp_selected_tier']),
         ]);
 
         try {
@@ -265,52 +268,23 @@ class WooCommerce_Hooks {
         }
     }
 
-    public function add_welp_compatible_meta(array $cart_item_data, int $product_id, int $variation_id): array {
-        $this->log('add_welp_compatible_meta filter called', [
-            'product_id' => $product_id,
-            'variation_id' => $variation_id,
-            'incoming_cart_item_data' => $cart_item_data,
-            'has_wc_cgm_tier' => isset($cart_item_data['wc_cgm_tier']),
-        ]);
-
-        if (!isset($cart_item_data['wc_cgm_tier'])) {
-            return $cart_item_data;
-        }
-
-        $tier = $cart_item_data['wc_cgm_tier'];
-
-        $cart_item_data['_welp_tier_level'] = $tier['level'];
-        $cart_item_data['_welp_tier_price'] = $tier['price'];
-        $cart_item_data['_welp_tier_price_type'] = $tier['price_type'];
-        $cart_item_data['_welp_tier_name'] = $tier['name'];
-
-        $cart_item_data['welp_tier_level'] = $tier['level'];
-        $cart_item_data['welp_tier'] = $tier['level'];
-
-        $this->log('WELP meta keys added to cart_item_data', [
-            'cart_item_data' => $cart_item_data,
-        ]);
-
-        return $cart_item_data;
-    }
-
     public function add_tier_to_order_item(\WC_Order_Item_Product $item, string $cart_item_key, array $cart_item, \WC_Order $order): void {
-        if (!isset($cart_item['wc_cgm_tier'])) {
+        if (!isset($cart_item['welp_tier'])) {
             return;
         }
 
-        $tier = $cart_item['wc_cgm_tier'];
+        $tier = $cart_item['welp_tier'];
 
-        $item->add_meta_data('_wc_cgm_tier_level', $tier['level']);
-        $item->add_meta_data('_wc_cgm_tier_price', $tier['price']);
-        $item->add_meta_data('_wc_cgm_tier_price_type', $tier['price_type']);
-        $item->add_meta_data('_wc_cgm_tier_name', $tier['name']);
-        $item->add_meta_data('Experience Level', $tier['name']);
+        $item->add_meta_data('_wc_cgm_tier_level', $tier['level'] ?? 1);
+        $item->add_meta_data('_wc_cgm_tier_price', $tier['price'] ?? 0);
+        $item->add_meta_data('_wc_cgm_tier_price_type', $tier['price_type'] ?? 'monthly');
+        $item->add_meta_data('_wc_cgm_tier_name', $tier['name'] ?? '');
+        $item->add_meta_data('Experience Level', $tier['name'] ?? '');
 
-        $this->log('Tier meta added to order item', [
+        $this->log('Tier meta added to order item from welp_tier', [
             'item_id' => $item->get_id(),
-            'tier_level' => $tier['level'],
-            'tier_name' => $tier['name'],
+            'tier_level' => $tier['level'] ?? null,
+            'tier_name' => $tier['name'] ?? null,
         ]);
     }
 

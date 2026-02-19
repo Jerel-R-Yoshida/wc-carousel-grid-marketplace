@@ -281,13 +281,20 @@
             var priceType = $panel.find('.wc-cgm-switch-input').is(':checked') ? 'hourly' : ($panel.data('default-price-type') || 'monthly');
             var quantity = parseInt($panel.find('.wc-cgm-quantity-input').val()) || 1;
 
+            // Extract tier details for WELP compatibility
+            var tierName = $panel.data('tier-' + tierLevel + '-name') || '';
+            var hourlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-hourly')) || 0;
+            var monthlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-monthly')) || 0;
+            var selectedPrice = priceType === 'monthly' ? monthlyPrice : hourlyPrice;
+
             WC_CGM_Marketplace.log('=== ADD TO CART CLICKED ===');
             WC_CGM_Marketplace.log('Button data-tier-level attr:', tierLevelAttr);
-            WC_CGM_Marketplace.log('Button data-tier-level via .data():', $btn.data('tier-level'));
             WC_CGM_Marketplace.log('Parsed tierLevel:', tierLevel);
             WC_CGM_Marketplace.log('ProductId:', productId);
             WC_CGM_Marketplace.log('PriceType:', priceType);
             WC_CGM_Marketplace.log('Quantity:', quantity);
+            WC_CGM_Marketplace.log('Tier Name:', tierName);
+            WC_CGM_Marketplace.log('Selected Price:', selectedPrice);
 
             var hasTiers = $card.data('has-tiers') || $panel.data('has-tiers');
             WC_CGM_Marketplace.log('hasTiers:', hasTiers);
@@ -298,10 +305,6 @@
                     alert(wc_cgm_ajax.i18n.select_tier || 'Please select an experience level.');
                     return;
                 }
-
-                var hourlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-hourly')) || 0;
-                var monthlyPrice = parseFloat($panel.data('tier-' + tierLevel + '-monthly')) || 0;
-                var selectedPrice = priceType === 'monthly' ? monthlyPrice : hourlyPrice;
 
                 WC_CGM_Marketplace.log('Tier prices - hourly:', hourlyPrice, 'monthly:', monthlyPrice, 'selected:', selectedPrice);
 
@@ -321,7 +324,12 @@
                 product_id: productId,
                 quantity: quantity,
                 tier_level: tierLevel,
-                price_type: priceType
+                price_type: priceType,
+                // WELP-expected field names for Cart_Integration::add_tier_to_cart()
+                welp_selected_tier: tierLevel,
+                welp_tier_name: tierName,
+                welp_tier_price: selectedPrice,
+                welp_price_type: priceType
             };
             
             WC_CGM_Marketplace.log('Sending AJAX with data:', ajaxData);

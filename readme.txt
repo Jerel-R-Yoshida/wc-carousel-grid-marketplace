@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.31
+Stable tag: 1.0.32
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,6 +87,15 @@ Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
 
+== 1.0.32 ==
+Released: 2026-02-20
+
+* **Fixed**: Add-to-cart now works correctly with WELP (WooCommerce Experience Level Pricing)
+* **Fixed**: JavaScript sends WELP-expected field names (welp_selected_tier, welp_tier_name, etc.)
+* **Fixed**: PHP sets $_POST fields before add_to_cart() so WELP can detect tier selection
+* **Changed**: Removed redundant add_welp_compatible_meta filter (WELP handles everything via $_POST)
+* **Changed**: Cart/checkout display now reads from welp_tier instead of wc_cgm_tier
+* **Improved**: Cleaner integration with WELP's native cart handling
 
 == 1.0.31 ==
 Released: 2026-02-20
