@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.19
+Stable tag: 1.0.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,6 +87,13 @@ Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
 
+== 1.0.20 ==
+Released: 2026-02-19
+
+* Changed: Monthly pricing button now appears first and is selected by default
+* Added: Tier description displayed above Monthly/Hourly buttons in pricing panel
+* Added: Card description shows selected tier's description (updates when tier changes)
+* Improved: Dynamic tier description updates via JavaScript when selecting different tiers
 
 == 1.0.19 ==
 Released: 2026-02-19

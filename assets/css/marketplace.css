@@ -291,6 +291,14 @@
     color: var(--wc-cgm-text-medium, #6b7280);
 }
 
+.wc-cgm-tier-description {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--wc-cgm-text-medium, #6b7280);
+    line-height: 1.4;
+}
+
 .wc-cgm-price-type-selector {
     display: flex;
     gap: 8px;
