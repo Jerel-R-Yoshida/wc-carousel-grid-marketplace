@@ -4,7 +4,7 @@ Tags: woocommerce, marketplace, carousel, grid, elementor, services, tiered pric
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 1.0.32
+Stable tag: 1.0.33
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,6 +86,15 @@ Yes! There's a native Elementor widget with full design controls.
 Yes, tiered pricing is optional and can be disabled in the plugin settings.
 
 == Changelog ==
+
+== 1.0.33 ==
+Released: 2026-02-20
+
+* **Added**: Enhanced debug logging for add-to-cart failures
+* **Added**: Captures WooCommerce error notices when add_to_cart fails
+* **Added**: Logs product state (purchasable, stock, price, status) before add_to_cart
+* **Added**: Logs WooCommerce session and customer state
+* **Improved**: Error messages now include actual WooCommerce error notices
 
 == 1.0.32 ==
 Released: 2026-02-20

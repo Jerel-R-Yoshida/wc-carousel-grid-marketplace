@@ -133,6 +133,12 @@ _Screenshots to be added_
 
 ## Changelog
 
+### 1.0.33 - 2026-02-20
+* Added: Enhanced debug logging for add-to-cart failures
+* Added: Captures WooCommerce error notices when add_to_cart fails
+* Added: Logs product state (purchasable, stock, price, status) before add_to_cart
+* Improved: Error messages now include actual WooCommerce error notices
+
 ### 1.0.32 - 2026-02-20
 * Fixed: Add-to-cart now works correctly with WELP (WooCommerce Experience Level Pricing)
 * Fixed: JavaScript sends WELP-expected field names (welp_selected_tier, welp_tier_name, etc.)

@@ -218,19 +218,35 @@ class WooCommerce_Hooks {
 
         $cart_item_data = [];
 
-        $this->log('Calling WC()->cart->add_to_cart', [
+        $product = wc_get_product($product_id);
+        $this->log('Product state before add_to_cart', [
             'product_id' => $product_id,
             'quantity' => $quantity,
             'welp_post_fields_set' => isset($_POST['welp_selected_tier']),
+            'product_exists' => $product ? 'yes' : 'no',
+            'product_type' => $product ? $product->get_type() : 'N/A',
+            'is_purchasable' => $product ? ($product->is_purchasable() ? 'yes' : 'no') : 'N/A',
+            'is_in_stock' => $product ? ($product->is_in_stock() ? 'yes' : 'no') : 'N/A',
+            'stock_status' => $product ? $product->get_stock_status() : 'N/A',
+            'stock_quantity' => $product ? $product->get_stock_quantity() : 'N/A',
+            'manage_stock' => $product ? ($product->managing_stock() ? 'yes' : 'no') : 'N/A',
+            'regular_price' => $product ? $product->get_regular_price() : 'N/A',
+            'price' => $product ? $product->get_price() : 'N/A',
+            'status' => $product ? $product->get_status() : 'N/A',
+            'wc_session_exists' => WC()->session ? 'yes' : 'no',
+            'wc_customer_exists' => WC()->customer ? 'yes' : 'no',
         ]);
 
         try {
             $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, 0, [], $cart_item_data);
 
+            $wc_notices = function_exists('wc_get_notices') ? wc_get_notices() : [];
             $this->log('add_to_cart result', [
                 'cart_item_key' => $cart_item_key,
                 'is_wp_error' => is_wp_error($cart_item_key),
                 'is_false' => $cart_item_key === false,
+                'wc_notices' => $wc_notices,
+                'cart_contents_count' => WC()->cart->get_cart_contents_count(),
             ]);
 
             if (is_wp_error($cart_item_key)) {
@@ -240,8 +256,50 @@ class WooCommerce_Hooks {
             }
 
             if (!$cart_item_key) {
-                $this->log('ERROR: add_to_cart returned false');
-                wp_send_json_error(['message' => __('Could not add to cart.', 'wc-carousel-grid-marketplace')]);
+                $error_notices = function_exists('wc_get_notices') ? wc_get_notices('error') : [];
+                $all_notices = function_exists('wc_get_notices') ? wc_get_notices() : [];
+                
+                $this->log('ERROR: add_to_cart returned false', [
+                    'error_notices' => $error_notices,
+                    'all_notices' => $all_notices,
+                    'product_id' => $product_id,
+                    'quantity' => $quantity,
+                    'product_details' => [
+                        'exists' => $product ? 'yes' : 'no',
+                        'type' => $product ? $product->get_type() : 'N/A',
+                        'purchasable' => $product ? $product->is_purchasable() : 'N/A',
+                        'in_stock' => $product ? $product->is_in_stock() : 'N/A',
+                        'status' => $product ? $product->get_status() : 'N/A',
+                    ],
+                    'cart_item_data_passed' => $cart_item_data,
+                    'welp_post_fields' => [
+                        'welp_selected_tier' => $_POST['welp_selected_tier'] ?? 'not set',
+                        'welp_tier_name' => $_POST['welp_tier_name'] ?? 'not set',
+                        'welp_tier_price' => $_POST['welp_tier_price'] ?? 'not set',
+                        'welp_price_type' => $_POST['welp_price_type'] ?? 'not set',
+                    ],
+                ]);
+
+                $error_message = __('Could not add to cart.', 'wc-carousel-grid-marketplace');
+                if (!empty($error_notices)) {
+                    $notice_messages = [];
+                    foreach ($error_notices as $notice) {
+                        if (is_array($notice) && isset($notice['notice'])) {
+                            $notice_messages[] = $notice['notice'];
+                        } elseif (is_string($notice)) {
+                            $notice_messages[] = $notice;
+                        }
+                    }
+                    if (!empty($notice_messages)) {
+                        $error_message = implode(' | ', $notice_messages);
+                    }
+                }
+
+                if (function_exists('wc_clear_notices')) {
+                    wc_clear_notices();
+                }
+
+                wp_send_json_error(['message' => $error_message]);
                 return;
             }
 
