@@ -307,9 +307,52 @@ class WooCommerce_Hooks {
             $cart_count = WC()->cart->get_cart_contents_count();
             $cart_total = WC()->cart->get_cart_total();
 
+            // Build cart data for mini-cart refresh (no extra AJAX needed)
+            $cart_items = [];
+            foreach (WC()->cart->get_cart() as $item_key => $cart_item) {
+                $product = $cart_item['data'];
+                
+                // Get tier_data (set by cart-quote-woocommerce-email plugin hook)
+                $tier_data = isset($cart_item['tier_data']) ? $cart_item['tier_data'] : null;
+                
+                // Also check for welp_tier (set by this plugin) as fallback
+                if (!$tier_data && isset($cart_item['welp_tier'])) {
+                    $welp_tier = $cart_item['welp_tier'];
+                    $tier_data = [
+                        'tier_level' => $welp_tier['level'] ?? '',
+                        'tier_name' => $welp_tier['name'] ?? '',
+                        'description' => $welp_tier['name'] ?? '',
+                        'monthly_price' => (float) ($welp_tier['price'] ?? 0),
+                        'hourly_price' => (float) ($welp_tier['price'] ?? 0),
+                    ];
+                }
+                
+                $cart_items[] = [
+                    'key' => $item_key,
+                    'product_id' => $cart_item['product_id'],
+                    'product_name' => $product->get_name(),
+                    'product_url' => $product->get_permalink(),
+                    'product_image' => $product->get_image(),
+                    'quantity' => $cart_item['quantity'],
+                    'price' => $product->get_price_html(),
+                    'line_total' => wc_price($cart_item['line_total']),
+                    'line_total_raw' => $cart_item['line_total'],
+                    'tier_data' => $tier_data,
+                ];
+            }
+
+            $cart_data = [
+                'items' => $cart_items,
+                'count' => $cart_count,
+                'subtotal' => WC()->cart->get_cart_subtotal(),
+                'is_empty' => WC()->cart->is_empty(),
+                'formatted_subtotal' => WC()->cart->get_cart_subtotal(),
+            ];
+
             $this->log('SUCCESS: Product added to cart', [
                 'cart_item_key' => $cart_item_key,
                 'cart_count' => $cart_count,
+                'cart_items_count' => count($cart_items),
             ]);
 
             wp_send_json_success([
@@ -318,6 +361,7 @@ class WooCommerce_Hooks {
                 'cart_count' => $cart_count,
                 'cart_total' => $cart_total,
                 'cart_hash' => WC()->cart->get_cart_hash(),
+                'cart_data' => $cart_data,
             ]);
         } catch (\Exception $e) {
             $this->log('EXCEPTION in add_to_cart', ['exception' => $e->getMessage()]);
