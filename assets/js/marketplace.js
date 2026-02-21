@@ -380,9 +380,14 @@
                     if (response.success) {
                         $btn.find('.wc-cgm-btn-text').text(wc_cgm_ajax.i18n.added_to_cart);
                         
+                        // Trigger WooCommerce fragment refresh for menu cart
                         $(document.body).trigger('wc_fragment_refresh');
 
-                        if (typeof window.cartQuoteRefreshMiniCart === 'function') {
+                        // Update mini-cart directly with cart_data from response (no extra AJAX)
+                        if (response.data.cart_data && typeof window.cartQuoteUpdateMiniCart === 'function') {
+                            window.cartQuoteUpdateMiniCart(response.data.cart_data);
+                        } else if (typeof window.cartQuoteRefreshMiniCart === 'function') {
+                            // Fallback: use old refresh method if cart_data not available
                             window.cartQuoteRefreshMiniCart({ full: true });
                         }
 
