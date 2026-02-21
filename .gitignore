@@ -8,3 +8,6 @@ Thumbs.db
 
 # Development
 *.log
+
+# Build scripts - local-only
+.gitignore.bak
