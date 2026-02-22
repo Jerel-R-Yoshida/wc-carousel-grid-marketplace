@@ -4,6 +4,7 @@
     var WC_CGM_Marketplace = {
         debug: wc_cgm_ajax?.debug || false,
         isLoading: true,
+        initialized: false,
 
         log: function(...args) {
             if (this.debug) {
@@ -17,6 +18,11 @@
         limit: 12,
 
         init: function() {
+            if (this.initialized) {
+                return;
+            }
+            this.initialized = true;
+            
             this.bindEvents();
             this.initCarousel();
             this.initDefaultTier();
