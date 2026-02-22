@@ -61,6 +61,17 @@ class Marketplace {
             $default_tier = $tiers[0];
         }
 
+        $has_tiers = !empty($tiers);
+
+        // Count tiers with actual prices
+        $tiers_with_prices = 0;
+        foreach ($tiers as $tier) {
+            if (($tier->hourly_price ?? 0) > 0 || ($tier->monthly_price ?? 0) > 0) {
+                $tiers_with_prices++;
+            }
+        }
+        $has_multiple_tiers = $tiers_with_prices > 1;
+
         $price_types = [];
         foreach ($tiers as $tier) {
             if ($tier->monthly_price > 0) $price_types['monthly'] = true;
@@ -72,14 +83,28 @@ class Marketplace {
         $default_tier_description = $default_tier ? ($default_tier->description ?? '') : '';
 
         $default_price = $default_tier ? ($default_price_type === 'monthly' ? $default_tier->monthly_price : $default_tier->hourly_price) : 0;
+        $monthly_price = $default_tier ? (float) $default_tier->monthly_price : 0;
+
+        // Fallback to WooCommerce product price when no tiers
+        if (!$has_tiers) {
+            $wc_price = (float) $product->get_price();
+            if ($wc_price > 0) {
+                $default_price = $wc_price;
+                $monthly_price = $wc_price;
+                $price_types = ['monthly'];
+                $default_price_type = 'monthly';
+            }
+        }
 
         ob_start();
 ?>
         <div class="wc-cgm-pricing-panel"
              data-product-id="<?php echo esc_attr($product_id); ?>"
+             data-has-tiers="<?php echo $has_tiers ? 'true' : 'false'; ?>"
+             data-has-multiple-tiers="<?php echo $has_multiple_tiers ? 'true' : 'false'; ?>"
+             data-product-price="<?php echo esc_attr(number_format($default_price, 2, '.', '')); ?>"
              data-default-tier="<?php echo esc_attr($default_tier->tier_level ?? 0); ?>"
              data-default-price-type="<?php echo esc_attr($default_price_type); ?>"
-             data-has-tiers="<?php echo !empty($tiers) ? 'true' : 'false'; ?>"
              <?php foreach ([1, 2, 3] as $level) : ?>
              data-tier-<?php echo esc_attr($level); ?>-hourly="<?php echo esc_attr($tier_data[$level]['hourly']); ?>"
              data-tier-<?php echo esc_attr($level); ?>-monthly="<?php echo esc_attr($tier_data[$level]['monthly']); ?>"
@@ -87,8 +112,7 @@ class Marketplace {
              data-tier-<?php echo esc_attr($level); ?>-description="<?php echo esc_attr($tier_data[$level]['description'] ?? ''); ?>"
              <?php endforeach; ?>>
 
-            <?php if (count($price_types) > 1) : ?>
-            <h4 class="wc-cgm-tier-description"><?php echo esc_html($default_tier_description); ?></h4>
+            <?php if ($has_tiers && count($price_types) > 1) : ?>
             <div class="wc-cgm-price-type-switch">
                 <span class="wc-cgm-switch-label <?php echo $default_price_type === 'monthly' ? 'active' : ''; ?>">
                     <?php esc_html_e('Monthly', 'wc-carousel-grid-marketplace'); ?>
@@ -122,6 +146,7 @@ class Marketplace {
                 </span>
             </div>
 
+            <?php if ($has_multiple_tiers) : ?>
             <div class="wc-cgm-tier-selector-mini">
                 <select class="wc-cgm-tier-select" name="wc_cgm_tier_level">
                     <?php foreach ($tiers as $tier) :
@@ -140,6 +165,7 @@ class Marketplace {
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php endif; ?>
 
             <div class="wc-cgm-headcount">
                 <span class="wc-cgm-headcount-label"><?php esc_html_e('Headcount:', 'wc-carousel-grid-marketplace'); ?></span>
@@ -156,8 +182,10 @@ class Marketplace {
 
             <div class="wc-cgm-total">
                 <span class="wc-cgm-total-label"><?php esc_html_e('Total', 'wc-carousel-grid-marketplace'); ?></span>
-                <span class="wc-cgm-total-price" data-total="<?php echo esc_attr(number_format($default_price, 2, '.', '')); ?>">
-                    <?php echo wc_price(number_format($default_price, 2, '.', '')); ?>/mo
+                <span class="wc-cgm-total-price"
+                      data-total="<?php echo esc_attr(number_format($default_price, 2, '.', '')); ?>"
+                      data-monthly-price="<?php echo esc_attr(number_format($monthly_price, 2, '.', '')); ?>">
+                    <?php echo wc_price(number_format($default_price, 2, '.', '')); ?><?php echo $has_tiers ? '/mo' : ''; ?>
                 </span>
             </div>
 

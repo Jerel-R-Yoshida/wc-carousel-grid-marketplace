@@ -216,7 +216,7 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.wc-cgm-shadow-light { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+.wc-cgm-shadow-light { /*box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); //Keep this removed*/ }
 .wc-cgm-shadow-medium { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
 .wc-cgm-shadow-strong { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15); }
 
@@ -732,4 +732,17 @@
 
 .wc-cgm-load-more.loading .dashicons {
     animation: wc-cgm-icon-spin 1s linear infinite;
+}
+
+/* Hide tier-specific elements for products without tiers */
+.wc-cgm-pricing-panel[data-has-tiers="false"] .wc-cgm-tier-description,
+.wc-cgm-pricing-panel[data-has-tiers="false"] .wc-cgm-tier-selector-mini,
+.wc-cgm-pricing-panel[data-has-tiers="false"] .wc-cgm-price-type-switch {
+    display: none !important;
+}
+
+/* Hide tier selector for single-tier products (only tier 1 has prices) */
+.wc-cgm-pricing-panel[data-has-multiple-tiers="false"] .wc-cgm-tier-description,
+.wc-cgm-pricing-panel[data-has-multiple-tiers="false"] .wc-cgm-tier-selector-mini {
+    display: none !important;
 }
