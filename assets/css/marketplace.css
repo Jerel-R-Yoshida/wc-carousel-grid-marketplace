@@ -756,7 +756,6 @@
 }
 
 /* Hide tier selector for single-tier products (only tier 1 has prices) */
-.wc-cgm-pricing-panel[data-has-multiple-tiers="false"] .wc-cgm-tier-description,
 .wc-cgm-pricing-panel[data-has-multiple-tiers="false"] .wc-cgm-tier-selector-mini {
     display: none !important;
 }

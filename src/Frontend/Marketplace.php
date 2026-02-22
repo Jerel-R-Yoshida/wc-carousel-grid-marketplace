@@ -112,6 +112,10 @@ class Marketplace {
              data-tier-<?php echo esc_attr($level); ?>-description="<?php echo esc_attr($tier_data[$level]['description'] ?? ''); ?>"
              <?php endforeach; ?>>
 
+            <?php if ($has_tiers && !empty($default_tier_description)) : ?>
+            <h4 class="wc-cgm-tier-description"><?php echo esc_html($default_tier_description); ?></h4>
+            <?php endif; ?>
+
             <?php if ($has_tiers && count($price_types) > 1) : ?>
             <div class="wc-cgm-price-type-switch">
                 <span class="wc-cgm-switch-label <?php echo $default_price_type === 'monthly' ? 'active' : ''; ?>">
