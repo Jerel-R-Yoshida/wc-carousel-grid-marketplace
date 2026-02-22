@@ -61,8 +61,6 @@ class Marketplace {
             $default_tier = $tiers[0];
         }
 
-        $has_tiers = !empty($tiers);
-
         // Count tiers with actual prices
         $tiers_with_prices = 0;
         foreach ($tiers as $tier) {
@@ -70,6 +68,7 @@ class Marketplace {
                 $tiers_with_prices++;
             }
         }
+        $has_tiers = $tiers_with_prices > 0;
         $has_multiple_tiers = $tiers_with_prices > 1;
 
         $price_types = [];

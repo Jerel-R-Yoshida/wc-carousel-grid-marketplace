@@ -16,8 +16,6 @@ foreach ($tiers as $tier) {
     }
 }
 
-$has_tiers = !empty($tiers);
-
 // Count tiers with actual prices
 $tiers_with_prices = 0;
 foreach ($tiers as $tier) {
@@ -25,6 +23,7 @@ foreach ($tiers as $tier) {
         $tiers_with_prices++;
     }
 }
+$has_tiers = $tiers_with_prices > 0;
 $has_multiple_tiers = $tiers_with_prices > 1;
 
 $hourly_price = $default_tier->hourly_price ?? 0;
