@@ -1,6 +1,6 @@
 .wc-cgm-marketplace {
-    display: grid;
-    grid-template-columns: 280px 1fr;
+    display: flex;
+    /*grid-template-columns: 280px 1fr;*/
     gap: 32px;
     padding: 24px;
     background: var(--wc-cgm-bg-page, #ffffff);
@@ -576,25 +576,25 @@
 }
 
 @media (max-width: 768px) {
-    .wc-cgm-grid {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: 16px;
-        padding-bottom: 16px;
-        margin: 0 -24px;
-        padding-left: 24px;
-        padding-right: 24px;
+    .wc-cgm-marketplace {
+        flex-direction: column;
     }
     
-    .wc-cgm-grid::-webkit-scrollbar {
+    .wc-cgm-sidebar {
         display: none;
     }
     
+    .wc-cgm-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 16px;
+    }
+    
     .wc-cgm-card {
-        min-width: 300px;
-        scroll-snap-align: start;
-        flex-shrink: 0;
+        width: 100%;
+        min-width: unset;
+        flex-shrink: 1;
     }
     
     .wc-cgm-filter-bar {
@@ -606,10 +606,6 @@
     .wc-cgm-marketplace {
         padding: 16px;
         gap: 16px;
-    }
-    
-    .wc-cgm-card {
-        min-width: 280px;
     }
     
     .wc-cgm-card-title {
