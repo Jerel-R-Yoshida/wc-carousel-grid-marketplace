@@ -445,13 +445,22 @@
             var $input = $(this);
             var $panel = $input.closest('.wc-cgm-pricing-panel');
             var quantity = parseInt($input.val()) || 1;
-            var monthlyPrice = parseFloat($panel.find('.wc-cgm-total-price').data('monthly-price')) || 0;
-            var total = monthlyPrice * quantity;
+            
+            var hasTiers = $panel.data('has-tiers');
+            var price = 0;
+            
+            if (hasTiers === 'false' || hasTiers === false) {
+                price = parseFloat($panel.data('product-price')) || 0;
+            } else {
+                price = parseFloat($panel.find('.wc-cgm-total-price').data('monthly-price')) || 0;
+            }
+            
+            var total = price * quantity;
 
             $panel.find('.wc-cgm-total-price').data('total', total);
 
             var formattedTotal = WC_CGM_Marketplace.formatPrice(total);
-            $panel.find('.wc-cgm-total-price').html(formattedTotal + '/mo');
+            $panel.find('.wc-cgm-total-price').html(formattedTotal + (hasTiers ? '/mo' : ''));
         },
 
         updateTierPrice: function(e) {

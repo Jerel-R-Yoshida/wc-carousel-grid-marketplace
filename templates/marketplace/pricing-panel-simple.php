@@ -16,21 +16,45 @@ foreach ($tiers as $tier) {
     }
 }
 
+$has_tiers = !empty($tiers);
+
+// Count tiers with actual prices
+$tiers_with_prices = 0;
+foreach ($tiers as $tier) {
+    if (($tier->hourly_price ?? 0) > 0 || ($tier->monthly_price ?? 0) > 0) {
+        $tiers_with_prices++;
+    }
+}
+$has_multiple_tiers = $tiers_with_prices > 1;
+
 $hourly_price = $default_tier->hourly_price ?? 0;
 $monthly_price = $default_tier->monthly_price ?? 0;
 
-$price_types = [];
-if ($monthly_price > 0) $price_types['monthly'] = true;
-if ($hourly_price > 0) $price_types['hourly'] = true;
-$price_types = array_keys($price_types);
+if (!$has_tiers && $product) {
+    $wc_price = (float) $product->get_price();
+    if ($wc_price > 0) {
+        $monthly_price = $wc_price;
+        $default_price = $wc_price;
+        $price_types = ['monthly'];
+        $default_price_type = 'monthly';
+    }
+} else {
+    $price_types = [];
+    if ($monthly_price > 0) $price_types['monthly'] = true;
+    if ($hourly_price > 0) $price_types['hourly'] = true;
+    $price_types = array_keys($price_types);
 
-$default_price_type = in_array('monthly', $price_types) ? 'monthly' : ($price_types[0] ?? 'hourly');
-$default_price = $default_price_type === 'monthly' ? $monthly_price : $hourly_price;
+    $default_price_type = in_array('monthly', $price_types) ? 'monthly' : ($price_types[0] ?? 'hourly');
+    $default_price = $default_price_type === 'monthly' ? $monthly_price : $hourly_price;
+}
 ?>
 
-<div class="wc-cgm-pricing-panel wc-cgm-simple" 
+<div class="wc-cgm-pricing-panel wc-cgm-simple"
      data-product-id="<?php echo esc_attr($product_id); ?>"
-     data-default-tier="<?php echo esc_attr($default_tier->tier_level ?? 1); ?>"
+     data-has-tiers="<?php echo $has_tiers ? 'true' : 'false'; ?>"
+     data-has-multiple-tiers="<?php echo $has_multiple_tiers ? 'true' : 'false'; ?>"
+     data-product-price="<?php echo esc_attr(number_format($default_price, 2, '.', '')); ?>"
+     data-default-tier="<?php echo esc_attr($default_tier->tier_level ?? 0); ?>"
      data-default-price-type="<?php echo esc_attr($default_price_type); ?>"
      <?php foreach ([1, 2, 3] as $level) :
         $tier_hourly = 0;
@@ -47,7 +71,7 @@ $default_price = $default_price_type === 'monthly' ? $monthly_price : $hourly_pr
      data-tier-<?php echo esc_attr($level); ?>-monthly="<?php echo esc_attr($tier_monthly); ?>"
      <?php endforeach; ?>>
 
-    <?php if (count($price_types) > 1) : ?>
+    <?php if ($has_tiers && count($price_types) > 1) : ?>
     <div class="wc-cgm-price-type-switch">
         <span class="wc-cgm-switch-label <?php echo $default_price_type === 'monthly' ? 'active' : ''; ?>">
             <?php esc_html_e('Monthly', 'wc-carousel-grid-marketplace'); ?>
@@ -93,7 +117,7 @@ $default_price = $default_price_type === 'monthly' ? $monthly_price : $hourly_pr
         <span class="wc-cgm-total-price"
               data-total="<?php echo esc_attr(number_format($default_price, 2, '.', '')); ?>"
               data-monthly-price="<?php echo esc_attr(number_format($monthly_price, 2, '.', '')); ?>">
-            <?php echo wc_price(number_format($default_price, 2, '.', '')); ?>/<?php echo $default_price_type === 'monthly' ? 'mo' : 'hr'; ?>
+            <?php echo wc_price(number_format($default_price, 2, '.', '')); ?><?php echo $has_tiers ? '/' . ($default_price_type === 'monthly' ? 'mo' : 'hr') : ''; ?>
         </span>
     </div>
 
