@@ -8,6 +8,9 @@
 }
 
 .wc-cgm-sidebar {
+    min-width: 400px;
+    max-width: 400px;
+    flex-shrink: 0;
     background: var(--wc-cgm-bg-sidebar, #fff);
     border-radius: var(--wc-cgm-radius, 12px);
     padding: 24px;
@@ -567,11 +570,21 @@
 
 @media (max-width: 1024px) {
     .wc-cgm-marketplace {
-        grid-template-columns: 1fr;
+        flex-direction: column;
     }
     
     .wc-cgm-sidebar {
-        display: none;
+        display: block;
+        order: 2;
+        width: 100%;
+        min-width: unset;
+        max-width: unset;
+        margin-top: 32px;
+        position: static;
+    }
+    
+    .wc-cgm-content {
+        order: 1;
     }
 }
 
@@ -581,7 +594,8 @@
     }
     
     .wc-cgm-sidebar {
-        display: none;
+        margin-top: 24px;
+        padding: 20px;
     }
     
     .wc-cgm-grid {
